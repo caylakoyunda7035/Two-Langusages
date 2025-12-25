@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Two Languages</title>
+<style>
+body{
+  font-family:Arial, sans-serif;
+  background:#f2f2f2;
+  margin:0;
+  padding:15px;
+}
+h1{text-align:center}
+
+input{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  font-size:16px;
+}
+button{
+  padding:7px 12px;
+  font-size:14px;
+  border:none;
+  border-radius:6px;
+  background:#007bff;
+  color:#fff;
+  cursor:pointer;
+  transition:transform .2s ease;
+}
+button:hover{transform:scale(1.08)}
+
+.counter{
+  text-align:center;
+  font-size:14px;
+  margin-bottom:10px;
+}
+
+.az{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-bottom:10px;
+}
+.az button{
+  background:#e0e0e0;
+  color:#000;
+  padding:4px 6px;
+  font-size:12px;
+}
+
+.box{
+  background:#e8e8e8;
+  padding:10px;
+  border-radius:6px;
+  margin-bottom:10px;
+}
+
+.word{
+  background:#fff;
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:6px;
+  position:relative;
+  transition:transform .2s ease;
+}
+.word:hover{transform:scale(1.05)}
+
+.star{
+  position:absolute;
+  right:10px;
+  top:10px;
+  cursor:pointer;
+  font-size:18px;
+}
+.lang{font-size:14px}
+.speak{
+  font-size:12px;
+  cursor:pointer;
+  margin-left:6px;
+}
+
+#quiz,#about{
+  display:none;
+  background:#fff;
+  padding:10px;
+  border-radius:6px;
+  margin-bottom:10px;
+}
+</style>
+</head>
+<body>
+
+<h1>🌍 Two Languages</h1>
+
+<input id="search" placeholder="Türkçe / İngilizce / Almanca ara...">
+
+<div class="counter" id="counter"></div>
+
+<div class="az" id="azMenu"></div>
+
+<div class="box">
+  <button onclick="randomWord()">🎲 Rastgele</button>
+  <button onclick="startQuiz()">🎓 Sınav</button>
+  <button onclick="toggleAbout()">ℹ️ Hakkında</button>
+</div>
+
+<div id="quiz">
+  <b id="qTr"></b>
+  <input id="qEn" placeholder="İngilizcesi">
+  <input id="qDe" placeholder="Almancası">
+  <button onclick="checkQuiz()">Kontrol Et</button>
+  <div id="qResult"></div>
+</div>
+
+<div id="about">
+  <h3>📘 Hakkında</h3>
+  <p>
+    Two Languages Zeyno87 ve Çaylak Oyunda tarafından yapılmış, ücretsiz bir dil öğrenme sitesidir.
+    Sitede Türkçe kelimelerin, İngilizce'ye ve Almanca'ya çevirilmiş halinde sözlüğü vardır.
+    Kelimeler favorilenebilir, sesli okuma özelliği ile telaffuz geliştirilebilir.
+    Sınav özelliği ilede öğrenilen kelimeler test edilebilir.
+  </p>
+  <ul>
+    <li><b>Site Adı:</b> Two Languages</li>
+    <li><b>Yapımcılar:</b> Zeyno87, Çaylak Oyunda</li>
+    <li><b>Yapım Tarihi:</b> 15.12.2025</li>
+    <li><b>Yayınlanma Tarihi:</b> 22.11.2025</li>
+    <li><b>Şu anki kelime sayısı:</b> <span id="aboutCount"></span></li>
+    <li><b>Hashtag:</b> #TwoLanguages</li>
+  </ul>
+</div>
+
+<div class="box">
+  <b>➕ Kelime Ekle</b>
+  <input id="tr" placeholder="Türkçe">
+  <input id="en" placeholder="İngilizce">
+  <input id="de" placeholder="Almanca">
+  <button onclick="addWord()">Ekle</button>
+</div>
+
+<div id="list"></div>
+
+<script>
+let words = JSON.parse(localStorage.getItem("words")) || [
+/* --- SENİN VERDİĞİN 91 KELİME, HİÇ DEĞİŞMEDİ --- */
+{tr:"Elma",en:"apple",de:"Apfel"},
+{tr:"Ev",en:"house",de:"Haus"},
+{tr:"Okul",en:"school",de:"Schule"},
+{tr:"Arkadaş",en:"friend",de:"Freund"},
+{tr:"Araba",en:"car",de:"Auto"},
+{tr:"Kitap",en:"book",de:"Buch"},
+{tr:"Bilgisayar",en:"computer",de:"Computer"},
+{tr:"Telefon",en:"phone",de:"Telefon"},
+{tr:"İnternet",en:"internet",de:"Internet"},
+{tr:"Oyun",en:"game",de:"Spiel"},
+{tr:"Mutlu",en:"happy",de:"Glücklich"},
+{tr:"Üzgün",en:"sad",de:"Traurig"},
+{tr:"Kolay",en:"easy",de:"Einfach"},
+{tr:"Çaylak",en:"noob",de:"Anfänger"},
+{tr:"Su",en:"water",de:"Wasser"},
+{tr:"Baba",en:"father",de:"papa"},
+{tr:"Ekmek",en:"bread",de:"Brot"},
+{tr:"Vermek",en:"give",de:"Geben"},
+{tr:"İlaç",en:"medicine",de:"Medizin"},
+{tr:"İdeal",en:"ideal",de:"Ideal"},
+{tr:"İhtimal",en:"possibility",de:"Wahrscheinlichkeit"},
+{tr:"Şans",en:"chance",de:"Chance"},
+{tr:"Armut",en:"pear",de:"Birne"},
+{tr:"Düğme",en:"button",de:"Taste"},
+{tr:"1",en:"one",de:"Eins"},
+{tr:"10",en:"ten",de:"Zehn"},
+{tr:"Kaçış",en:"espace",de:"Flucht"},
+{tr:"İnek",en:"cow",de:"Kuh"},
+{tr:"Doğa",en:"nature",de:"Natur"},
+{tr:"Makas",en:"scissors",de:"Schere"},
+{tr:"Soyu tükenmiş",en:"extinct",de:"Ausgestorben"},
+{tr:"Far",en:"headlight",de:"Scheinwerfer"},
+{tr:"Fark",en:"difference",de:"Unterschied"},
+{tr:"Fay",en:"fault",de:"Fehler"},
+{tr:"Fal",en:"fortune telling",de:"Wahrsagerei"},
+{tr:"Issız",en:"unemployed",de:"Arbeitslos"},
+{tr:"Af",en:"amnesty",de:"Amnestie"},
+{tr:"Çok",en:"a lot",de:"Eine Menge"},
+{tr:"Cam",en:"pine",de:"Kiefer"},
+{tr:"Umut",en:"hope",de:"Hoffnung"},
+{tr:"Alarm",en:"alarm",de:"Alarm"},
+{tr:"Özgüven",en:"confidence",de:"vertrauen"},
+{tr:"Nal",en:"horseshoe",de:"Hufeisen"},
+{tr:"At",en:"horse",de:"Pferd"},
+{tr:"Ayak",en:"foot",de:"Fuß"},
+{tr:"Futbol",en:"soccer",de:"Fußball"},
+{tr:"Köprü",en:"bridge",de:"Brücke"},
+{tr:"Deniz",en:"sea",de:"Meer"},
+{tr:"Dağ",en:"mountain",de:"Berg"},
+{tr:"Orman",en:"forest",de:"Wald"},
+{tr:"Göl",en:"lake",de:"See"},
+{tr:"Nehir",en:"river",de:"Fluss"},
+{tr:"Bulut",en:"cloud",de:"Wolke"},
+{tr:"Yağmur",en:"rain",de:"Regen"},
+{tr:"Rüzgar",en:"wind",de:"Wind"},
+{tr:"Ateş",en:"fire",de:"Feuer"},
+{tr:"Toprak",en:"soil",de:"Boden"},
+{tr:"Taş",en:"stone",de:"Stein"},
+{tr:"Ağaç",en:"tree",de:"Baum"},
+{tr:"Yaprak",en:"leaf",de:"Blatt"},
+{tr:"Balık",en:"fish",de:"Fisch"},
+{tr:"Kuş",en:"bird",de:"Vogel"},
+{tr:"Yıldız",en:"star",de:"Stern"},
+{tr:"Ay",en:"moon",de:"Mond"},
+{tr:"Güneş",en:"sun",de:"Sonne"},
+{tr:"Gökyüzü",en:"sky",de:"Himmel"},
+{tr:"Oyuncu",en:"player",de:"Spieler"},
+{tr:"Seviye",en:"level",de:"Level"},
+{tr:"Puan",en:"score",de:"Punktzahl"},
+{tr:"Can",en:"life",de:"Leben"},
+{tr:"Harita",en:"map",de:"Karte"},
+{tr:"Görev",en:"mission",de:"Mission"},
+{tr:"Silah",en:"weapon",de:"Waffe"},
+{tr:"Zırh",en:"armor",de:"Rüstung"},
+{tr:"Karakter",en:"character",de:"Charakter"},
+{tr:"Düşman",en:"enemy",de:"Gegner"},
+{tr:"Patron",en:"boss",de:"Chef"},
+{tr:"Kazanmak",en:"win",de:"Gewinnen"},
+{tr:"Kaybetmek",en:"lose",de:"Verlieren"},
+{tr:"Başlat",en:"start",de:"Starten"},
+{tr:"Durdur",en:"pause",de:"Pausieren"},
+{tr:"Kaydet",en:"save",de:"Speichern"},
+{tr:"Yükle",en:"load",de:"Laden"},
+{tr:"Çevrimiçi",en:"online",de:"Online"},
+{tr:"Çevrimdışı",en:"offline",de:"Offline"},
+{tr:"Zaman",en:"time",de:"Zeit"},
+{tr:"Yakışıklı",en:"handsome",de:"Gutaussehend"},
+{tr:"Hedef", en:"target", de:"Ziel"},
+{tr:"Hafıza", en:"memory", de:"Gedächtnis"},
+{tr:"Islak", en:"wet", de:"Nass"},
+{tr:"Isı", en:"heat", de:"Wärme"},
+{tr:"Uçak", en:"airplane", de:"Flugzeug"},
+{tr:"Uyarı", en:"warning", de:"Warnung"},
+{tr:"Ücret", en:"fee", de:"Gebühr"},
+{tr:"Ürün", en:"product", de:"Produkt"},
+{tr:"Jet", en:"jet", de:"Jetflugzeug"},
+{tr:"Jilet", en:"razor blade", de:"Rasierklinge"},
+{tr:"Nasihat",en:"Advice",de:"Beratung"},
+{tr:"Pusula",en:"Compass",de:"Kompass"},
+{tr:"zor",en:"hard",de:"Schwierig"}
+];
+
+let favs = JSON.parse(localStorage.getItem("favs")) || [];
+
+const list=document.getElementById("list");
+const search=document.getElementById("search");
+const counter=document.getElementById("counter");
+const quiz=document.getElementById("quiz");
+const qTr=document.getElementById("qTr");
+const qEn=document.getElementById("qEn");
+const qDe=document.getElementById("qDe");
+const qResult=document.getElementById("qResult");
+const about=document.getElementById("about");
+
+function updateCounter(){
+  counter.textContent=`📊 Toplam: ${words.length} | ⭐ Favori: ${favs.length}`;
+}
+
+function speak(t,l){
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang=l;
+  speechSynthesis.speak(u);
+}
+
+function show(filter="",letter=""){
+  list.innerHTML="";
+  words.filter(w=>{
+    const f=filter.toLowerCase();
+    return(
+      w.tr.toLowerCase().includes(f)||
+      w.en.toLowerCase().includes(f)||
+      w.de.toLowerCase().includes(f)
+    )&&(letter===""||w.tr.toLowerCase().startsWith(letter));
+  }).forEach(w=>{
+    const d=document.createElement("div");
+    d.className="word";
+    d.innerHTML=`
+      <div class="star" onclick="toggleFav('${w.tr}')">${favs.includes(w.tr)?"⭐":"☆"}</div>
+      <div class="lang">TR: ${w.tr}</div>
+      <div class="lang">🇬🇧 ${w.en}<span class="speak" onclick="speak('${w.en}','en-US')">🔊</span></div>
+      <div class="lang">🇩🇪 ${w.de}<span class="speak" onclick="speak('${w.de}','de-DE')">🔊</span></div>
+    `;
+    list.appendChild(d);
+  });
+  updateCounter();
+}
+
+function toggleFav(tr){
+  favs = favs.includes(tr) ? favs.filter(f=>f!==tr) : [...favs,tr];
+  localStorage.setItem("favs",JSON.stringify(favs));
+  show(search.value);
+}
+
+function addWord(){
+  const tr=document.getElementById("tr").value.trim();
+  const en=document.getElementById("en").value.trim();
+  const de=document.getElementById("de").value.trim();
+  if(!tr||!en||!de) return alert("Boş bırakma");
+  words.push({tr,en,de});
+  localStorage.setItem("words",JSON.stringify(words));
+  show("");
+}
+
+function randomWord(){
+  const w=words[Math.floor(Math.random()*words.length)];
+  alert(`TR: ${w.tr}\nEN: ${w.en}\nDE: ${w.de}`);
+}
+
+let quizWord=null;
+function startQuiz(){
+  quizWord=words[Math.floor(Math.random()*words.length)];
+  quiz.style.display="block";
+  qTr.textContent="Türkçe: "+quizWord.tr;
+  qEn.value="";
+  qDe.value="";
+  qResult.textContent="";
+}
+
+function checkQuiz(){
+  const en=qEn.value.trim().toLowerCase();
+  const de=qDe.value.trim().toLowerCase();
+  qResult.textContent=
+    (en===quizWord.en.toLowerCase() && de===quizWord.de.toLowerCase())
+    ? "✅ Doğru"
+    : `❌ Yanlış | ${quizWord.en} / ${quizWord.de}`;
+}
+
+function toggleAbout(){
+  about.style.display = about.style.display==="block"?"none":"block";
+  document.getElementById("aboutCount").textContent = words.length;
+}
+
+search.addEventListener("input",()=>show(search.value));
+
+const az="abcçdefgğhıijklmnoöprsştuüvyz";
+const azMenu=document.getElementById("azMenu");
+[...az].forEach(l=>{
+  const b=document.createElement("button");
+  b.textContent=l.toUpperCase();
+  b.onclick=()=>show(search.value,l);
+  azMenu.appendChild(b);
+});
+
+show();
+</script>
+
+</body>
+</html>
