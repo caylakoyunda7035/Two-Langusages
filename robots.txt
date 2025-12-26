@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://twolanguages.netlify.app/sitemap.xml
